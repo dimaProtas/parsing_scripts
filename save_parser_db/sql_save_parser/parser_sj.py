@@ -10,8 +10,8 @@ from pprint import pprint
 
 url_super_job = 'https://www.superjob.ru/'
 url_search = url_super_job + 'vacancy/search'
-
 #https://www.superjob.ru/vacancy/search/?keywords=python%20backend&geo%5Bt%5D%5B0%5D=4
+
 
 def parsing_super_job(url_search):
     def clean_text(text):
@@ -46,11 +46,11 @@ def parsing_super_job(url_search):
         all_list_vacancy = scope.find('div', {'class': '_1dYCz _2MONE'})
 
         next_link_scope = scope.find('a', {'class': 'f-test-link-Dalshe'})
+
         if next_link_scope != None:
             next_link = url_super_job + next_link_scope['href']
         else:
             next_link = None
-
 
         try:
             items = all_list_vacancy.find_all('div', {'class': '_2bKwW _1L7d1'})
@@ -62,17 +62,20 @@ def parsing_super_job(url_search):
             job_name = item.getText()
             job_link = url_super_job + item['href']
             compensation = i.find('span', {'class': '_2eYAG'}).getText()
-            compensation_list = clean_text(compensation).split(' ')
+            compensation_list = clean_text(compensation).strip().split(' ')
             try:
                 currency_symbol_match = re.search(r'([₽$€£])', compensation).group(1)
             except AttributeError:
                 currency_symbol_match = None
 
-            if len(compensation_list) > 1:
-                min_compensation = compensation_list[0]
-                max_compensation = compensation_list[1]
+            if compensation_list == ['']:
+                min_compensation = None
+                max_compensation = None
+            elif len(compensation_list) > 1:
+                min_compensation = int(compensation_list[0])
+                max_compensation = int(compensation_list[1])
             else:
-                min_compensation = compensation_list[0]
+                min_compensation = int(compensation_list[0])
                 max_compensation = None
 
             try:
@@ -82,36 +85,24 @@ def parsing_super_job(url_search):
             except AttributeError:
                 company_name = None
                 company_link = None
-            print(1)
 
             item_data = {
-                'company': {
-                    'company_name': company_name,
-                    'company_link': company_link,
-                },
+                'company_name': company_name,
+                'company_link': company_link,
                 'name_job': job_name,
-                'compensation': {
-                    'compensation': {
-                        'min_compensation': min_compensation,
-                        'max_compensation': max_compensation,
-                        'currency_symbol_match': currency_symbol_match
-                    },
-                },
+                'min_compensation': min_compensation,
+                'max_compensation': max_compensation,
+                'currency_symbol_match': currency_symbol_match,
                 'link_job': job_link,
             }
 
             vacancy_all.append(item_data)
+
     # print(f'Записанно {len(vacancy_all)} вакансий {params["keywords"]}')
     # pprint(vacancy_all)
 
-
-    # pprint(len(vacancy_all))
-    with open(f'{params.get("keywords")}_sj.json', 'w') as f:
-        for vacancy in vacancy_all:
-            # Преобразование словаря в строку JSON и запись в файл
-            json.dump(vacancy, f, ensure_ascii=False)
-            f.write('\n')  # Добавление новой строки между записями
-    pprint(f'Записано в фаил {len(vacancy_all)} вакансий успешно!')
+    print(f'Получено {len(vacancy_all)} вакансий!')
+    return vacancy_all
 
 
-parsing_super_job(url_search)
+# parsing_super_job(url_search)

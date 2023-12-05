@@ -1,4 +1,7 @@
 venv/
-lesson_2/_hh.json
-lesson_2/python backend_hh.json
-lesson_2/python_hh.json
+parser_hh_superjob/_hh.json
+parser_hh_superjob/python backend_hh.json
+parser_hh_superjob/python_hh.json
+save_parser_db/data-mongodb
+save_parser_db/sql_save_parser/super_job.db
+save_parser_db/users.db
