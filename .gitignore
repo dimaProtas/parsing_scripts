@@ -5,3 +5,4 @@ parser_hh_superjob/python_hh.json
 save_parser_db/data-mongodb
 save_parser_db/sql_save_parser/super_job.db
 save_parser_db/users.db
+xpath_parser/news.db
