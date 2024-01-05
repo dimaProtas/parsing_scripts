@@ -56,6 +56,7 @@ SPIDER_MIDDLEWARES = {
 DOWNLOADER_MIDDLEWARES = {
    'instagram.middlewares.InstagramDownloaderMiddleware': 543,
    'instagram.middlewares.TooManyRequestsRetryMiddleware': 200,
+   'instagram.middlewares.MyspiderProxyMiddleware': 100,
 
 }
 

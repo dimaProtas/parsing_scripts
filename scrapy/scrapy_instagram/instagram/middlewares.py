@@ -8,6 +8,33 @@ from scrapy import signals
 # useful for handling different item types with a single interface
 from itemadapter import is_item, ItemAdapter
 from scrapy.downloadermiddlewares.retry import RetryMiddleware
+import requests
+from scrapy.http import HtmlResponse
+
+
+class MyspiderProxyMiddleware(object):
+    def process_request(self, request, spider):
+        if hasattr(spider, 'proxy') and spider.proxy:
+            # Проверяем, имеет ли URL прокси протокол (http:// или https://)
+            if not spider.proxy.startswith(('http://', 'https://')):
+                spider.proxy = f'http://{spider.proxy}'
+
+            # Добавляем учетные данные к URL прокси, если они заданы
+            if hasattr(spider, 'proxy_username') and hasattr(spider, 'proxy_password'):
+                spider.proxy = f'{spider.proxy_username}:{spider.proxy_password}@{spider.proxy}'
+
+            try:
+                # Пытаемся сделать запрос через прокси с помощью requests
+                response = requests.get(request.url, proxies={'http': spider.proxy, 'https': spider.proxy}, timeout=5)
+                # Если запрос проходит успешно, создаем HtmlResponse и возвращаем его
+                if response.ok:
+                    return HtmlResponse(url=request.url, body=response.content, encoding='utf-8', request=request)
+            except Exception as e:
+                print(f"Error using proxy {spider.proxy}: {e}")
+
+        if hasattr(spider, 'uagent') and spider.uagent:
+            request.headers['User-Agent'] = spider.uagent
+
 
 class TooManyRequestsRetryMiddleware(RetryMiddleware):
     def __init__(self, crawler):

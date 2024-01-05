@@ -45,3 +45,6 @@ class AvitoPhotosPipeline(ImagesPipeline):
     def file_path(self, request, response=None, info=None, *, item=None):
         return f"{request.meta['name']}/{request.meta['file']}.jpg"
         # return f"{item['name'][:10]}/" + os.path.basename(urlparse(request.url).path) # Вариант сохранения №2
+
+
+print('Даг Хеллман: Стандартная библиотека Python 3. Справочник с примерами/file_1.jpg')
